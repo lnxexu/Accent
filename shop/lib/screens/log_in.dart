@@ -4,6 +4,8 @@ import 'signup.dart';
 import 'forgot_pass.dart';
 
 class LoginScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +16,6 @@ class LoginScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          // Add a big letter for a logo
           children: <Widget>[
             Text(
               'ACCENT',
@@ -25,9 +26,9 @@ class LoginScreen extends StatelessWidget {
                 fontStyle: FontStyle.italic,
               ),
             ),
-            // Add a space between the logo and the form
             SizedBox(height: 20.0),
             TextField(
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -35,6 +36,7 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(height: 16.0),
             TextField(
+              controller: passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -44,14 +46,35 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                // check if the email and password are correct
-                // if correct, navigate to the home screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(),
-                  ),
-                );
+                if (emailController.text == "Admin" &&
+                    passwordController.text == "password") {
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(),
+                      ),
+                    );
+                  });
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('Invalid credentials'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
               child: Text('Log In'),
             ),

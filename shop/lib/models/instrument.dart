@@ -11,7 +11,7 @@ class Instrument {
   final String imageUrl;
   final double? rentalDailyRate;
   final bool isAvailableForRent;
-  int availableForRent;
+  String? color;
 
   Instrument({
     required this.id,
@@ -24,7 +24,7 @@ class Instrument {
     required this.imageUrl,
     this.rentalDailyRate,
     this.isAvailableForRent = false,
-    this.availableForRent = 0,
+    this.color,
   });
 
   Instrument copyWith({
@@ -38,7 +38,7 @@ class Instrument {
     String? imageUrl,
     double? rentalDailyRate,
     bool? isAvailableForRent,
-    int? availableForRent,
+    String? color,
   }) {
     return Instrument(
       id: id ?? this.id,
@@ -51,7 +51,11 @@ class Instrument {
       imageUrl: imageUrl ?? this.imageUrl,
       rentalDailyRate: rentalDailyRate ?? this.rentalDailyRate,
       isAvailableForRent: isAvailableForRent ?? this.isAvailableForRent,
-      availableForRent: availableForRent ?? this.availableForRent,
+      color: color ?? this.color,
     );
+  }
+
+  void setColor(String selectedColor) {
+    color = selectedColor;
   }
 }

@@ -38,14 +38,6 @@ class InstrumentNotifier extends ChangeNotifier {
     }
   }
 
-  void updateRentalStock(String id, int newQuantity) {
-    final index = _instruments.indexWhere((instrument) => instrument.id == id);
-    if (index != -1) {
-      _instruments[index].availableForRent = newQuantity;
-      notifyListeners();
-    }
-  }
-
   void removeInstrument(String id) {
     _instruments.removeWhere((instrument) => instrument.id == id);
     notifyListeners();

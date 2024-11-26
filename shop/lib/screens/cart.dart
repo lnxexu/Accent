@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shop/models/instrument.dart';
 import '/providers/cart_provider.dart';
 import 'delivery_receipt.dart';
 
@@ -24,6 +25,8 @@ class CartScreen extends ConsumerWidget {
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
                 final item = cartItems[index];
+                final isStringInstrument =
+                    item['category'] == InstrumentCategory.string.toString();
                 return ListTile(
                   leading: Checkbox(
                     value: item['selected'] ?? false,
@@ -31,7 +34,11 @@ class CartScreen extends ConsumerWidget {
                       cartNotifier.toggleItemSelection(index);
                     },
                   ),
-                  title: Text(item['name']),
+                  title: Text(
+                    isStringInstrument
+                        ? '${item['name']} - Color: ${item['color'] ?? 'None'}'
+                        : item['name'],
+                  ),
                   subtitle: Text('\$${item['price']}'),
                 );
               },

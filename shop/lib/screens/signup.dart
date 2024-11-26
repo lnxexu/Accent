@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shop/data/usersDB.dart';
+// import 'package:shop/data/usersDB.dart';
 import 'package:shop/models/users.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -29,7 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: _passwordController.text,
       );
 
-      await UsersDB.instance.createUser(newUser);
+      // await UsersDB.instance.createUser(newUser);
 
       print('User created: ${newUser.username}');
       ScaffoldMessenger.of(context).showSnackBar(

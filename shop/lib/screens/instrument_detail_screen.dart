@@ -9,7 +9,7 @@ import 'full_screen.dart'; // Import the new screen
 import 'cart.dart';
 import '/providers/cart_provider.dart'; // Import the cart provider
 
-class InstrumentDetailScreen extends ConsumerWidget {
+class InstrumentDetailScreen extends ConsumerStatefulWidget {
   final Instrument instrument;
 
   const InstrumentDetailScreen({
@@ -18,7 +18,16 @@ class InstrumentDetailScreen extends ConsumerWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _InstrumentDetailScreenState createState() => _InstrumentDetailScreenState();
+}
+
+class _InstrumentDetailScreenState
+    extends ConsumerState<InstrumentDetailScreen> {
+  Color? selectedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final instrument = widget.instrument;
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -98,10 +107,14 @@ class InstrumentDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildColorOption(Colors.red),
-                  _buildColorOption(const Color.fromARGB(255, 255, 255, 255)),
+                  _buildColorOption(Colors.blue),
                   _buildColorOption(Colors.black),
+                  _buildColorOption(Colors.brown),
+                  _buildColorOption(Colors.white),
+                  _buildColorOption(Colors.green),
                 ],
               ),
               const SizedBox(height: 16),
@@ -125,18 +138,17 @@ class InstrumentDetailScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: instrument.stockQuantity > 0
-                  ? () => _showSaleDialog(context, ref)
+                  ? () => _showSaleDialog(context, ref, instrument)
                   : null,
               child: const Text('Buy Now'),
             ),
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: instrument.stockQuantity > 0
-                  ? () => _addToCart(context, ref)
+                  ? () => _addToCart(context, ref, instrument)
                   : null,
               child: const Text('Add to Cart'),
             ),
-
             const Divider(),
             Text(
               'Customer Reviews',
@@ -158,52 +170,52 @@ class InstrumentDetailScreen extends ConsumerWidget {
   Widget _buildColorOption(Color color) {
     return GestureDetector(
       onTap: () {
-        // Handle color selection
+        setState(() {
+          selectedColor = color;
+          widget.instrument.color = color.toString();
+        });
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4.0),
-        width: 36,
-        height: 36,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey),
+          boxShadow: selectedColor == color
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.6),
+                    spreadRadius: 5,
+                    blurRadius: 10,
+                  ),
+                ]
+              : [],
+          border: Border.all(
+            color: selectedColor == color ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildReview(String name, String review, int rating) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            name,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: List.generate(
-              5,
-              (index) => Icon(
-                index < rating ? Icons.star : Icons.star_border,
-                color: Colors.amber,
-                size: 16,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(review),
-        ],
+  void _addToCart(BuildContext context, WidgetRef ref, Instrument instrument) {
+    ref.read(cartProvider.notifier).addItem({
+      'name': instrument.name,
+      'price': instrument.price,
+      'color': selectedColor?.toString(),
+      'selected': false,
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            '${instrument.name} added to cart with color ${selectedColor?.toString()}'),
       ),
     );
   }
 
-  void _showSaleDialog(BuildContext context, WidgetRef ref) {
+  void _showSaleDialog(
+      BuildContext context, WidgetRef ref, Instrument instrument) {
     final quantityController = TextEditingController(text: '1');
 
     showDialog(
@@ -262,14 +274,33 @@ class InstrumentDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _addToCart(BuildContext context, WidgetRef ref) {
-    ref.read(cartProvider.notifier).addItem({
-      'name': instrument.name,
-      'price': instrument.price,
-      'selected': false,
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Added to cart')),
+  Widget _buildReview(String name, String review, int rating) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: List.generate(
+              5,
+              (index) => Icon(
+                index < rating ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(review),
+        ],
+      ),
     );
   }
 }
